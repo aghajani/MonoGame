@@ -843,7 +843,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
     }
 
-    internal class MonoGameGLException : Exception
+    public class MonoGameGLException : Exception
     {
         public MonoGameGLException(string message)
             : base(message)
