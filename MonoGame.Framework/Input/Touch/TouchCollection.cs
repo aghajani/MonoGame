@@ -48,17 +48,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// Provides state information for a touch screen enabled device.
     /// </summary>
     public struct TouchCollection : IList<TouchLocation>
-	{
+    {
         private TouchLocation[] _collection;
 
-		#region Properties
+        #region Properties
 
         /// <summary>
         /// States if a touch screen is available.
         /// </summary>
         public bool IsConnected { get { return TouchPanel.GetCapabilities().IsConnected; } }
 
-		#endregion
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchCollection"/> with a pre-determined set of touch locations.
@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="touchLocation"></param>
         /// <returns></returns>
         public bool FindById(int id, out TouchLocation touchLocation)
-		{
+        {
             for (var i = 0; i < _collection.Length; i++)
             {
                 var location = _collection[i];
@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             touchLocation = default(TouchLocation);
             return false;
-		}
+        }
 
         #region IList<TouchLocation>
 
@@ -206,7 +206,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                return _collection.Length;
+                if (_collection != null)
+                    return _collection.Length;
+                else
+                    return 0;
             }
         }
 
