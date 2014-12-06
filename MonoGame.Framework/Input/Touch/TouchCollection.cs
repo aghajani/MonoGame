@@ -179,8 +179,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             get
             {
                 return Collection.Length;
-                else
-                    return 0;
             }
         }
 
