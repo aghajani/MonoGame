@@ -109,6 +109,7 @@ namespace MonoGame.Tools.Pipeline
             _toolStripSeparator2.Name = "_toolStripSeparator2";
             _toolStripSeparator2.Size = new System.Drawing.Size(143, 6);
             // 
+            this._treeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TreeViewOnKeyDown);
             // _splitEditorOutput
             // 
             _splitEditorOutput.Dock = System.Windows.Forms.DockStyle.Fill;
