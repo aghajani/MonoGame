@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
-{    
+{
     partial class MainView : Form, IView, IProjectObserver
     {
         // The project which will be opened as soon as a controller is attached.
@@ -25,12 +25,12 @@ namespace MonoGame.Tools.Pipeline
         private ImageList _treeIcons;
 
         private bool _treeUpdating;
-        private bool _treeSort;        
+        private bool _treeSort;
 
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
         private const int FolderClosedIcon = 2;
-        private const int ProjectIcon = 3;        
+        private const int ProjectIcon = 3;
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -38,22 +38,22 @@ namespace MonoGame.Tools.Pipeline
         public static MainView Form { get; private set; }
 
         public MainView()
-        {            
+        {
             InitializeComponent();
 
             // Set the application icon this form.
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
             // Find an appropriate font for console like output.
-            var faces = new [] { "Consolas", "Lucida Console", "Courier New" };
-            for (var f=0; f < faces.Length; f++)
+            var faces = new[] { "Consolas", "Lucida Console", "Courier New" };
+            for (var f = 0; f < faces.Length; f++)
             {
                 _outputWindow.Font = new System.Drawing.Font(faces[f], 9F, FontStyle.Regular, GraphicsUnit.Point, (byte)0);
                 if (_outputWindow.Font.Name == faces[f])
-                    break;               
+                    break;
             }
 
-            _outputWindow.SelectionHangingIndent = TextRenderer.MeasureText(" ", _outputWindow.Font).Width;            
+            _outputWindow.SelectionHangingIndent = TextRenderer.MeasureText(" ", _outputWindow.Font).Width;
 
             _treeIcons = new ImageList();
             var asm = Assembly.GetExecutingAssembly();
@@ -61,7 +61,7 @@ namespace MonoGame.Tools.Pipeline
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
-            
+
             _treeView.ImageList = _treeIcons;
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
             _treeView.BeforeCollapse += TreeViewOnBeforeCollapse;
@@ -69,6 +69,14 @@ namespace MonoGame.Tools.Pipeline
             _treeView.NodeMouseDoubleClick += TreeViewOnNodeMouseDoubleClick;
 
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
+
+            _projectTargetPlatforms.BeginUpdate();
+            _projectTargetPlatforms.Items.Clear();
+            foreach (var fe1 in Enum.GetValues(typeof(Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform)).Cast<Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform>())
+            {
+                _projectTargetPlatforms.Items.Add(new TargetPlatformItem(fe1), false);
+            }
+            _projectTargetPlatforms.EndUpdate();
 
             Form = this;
         }
@@ -98,7 +106,7 @@ namespace MonoGame.Tools.Pipeline
             // Load icon
             try
             {
-                var iconPath = Path.Combine(Path.GetDirectoryName(template.TemplateFile), template.Icon);                
+                var iconPath = Path.Combine(Path.GetDirectoryName(template.TemplateFile), template.Icon);
                 var iconName = Path.GetFileNameWithoutExtension(iconPath);
 
                 if (!EditorIcons.Templates.Images.ContainsKey(iconName))
@@ -129,7 +137,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 var i = n.Tag as IProjectItem;
                 if (i.OriginalPath == projectItem.OriginalPath)
-                    return n;                
+                    return n;
             }
 
             return null;
@@ -150,7 +158,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = obj as ContentItem;
                 var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
-                _controller.AddAction(action);                
+                _controller.AddAction(action);
                 _controller.OnProjectModified();
             }
             else
@@ -160,7 +168,7 @@ namespace MonoGame.Tools.Pipeline
                 _controller.AddAction(action);
 
                 _controller.OnProjectModified();
-            }                
+            }
         }
 
         private void TreeViewOnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -213,7 +221,7 @@ namespace MonoGame.Tools.Pipeline
             if (!(args.Node.Tag is ContentItem))
                 return;
 
-            ContextMenu_OpenFile_Click(sender, args);            
+            ContextMenu_OpenFile_Click(sender, args);
         }
 
         public void UpdateRecentProjectList()
@@ -263,7 +271,7 @@ namespace MonoGame.Tools.Pipeline
                 AddExtension = true,
                 CheckPathExists = true,
                 Filter = MonoGameContentProjectFileFilter,
-                FilterIndex = 2,                
+                FilterIndex = 2,
             };
             var result = dialog.ShowDialog(this);
             filePath = dialog.FileName;
@@ -345,7 +353,7 @@ namespace MonoGame.Tools.Pipeline
             _treeSort = true;
 
             var path = item.Location;
-            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
 
             var root = _treeView.Nodes[0];
             var parent = root.Nodes;
@@ -361,7 +369,7 @@ namespace MonoGame.Tools.Pipeline
                     var idx = path.IndexOf(folder);
                     var curPath = path.Substring(0, idx + folder.Length);
                     folderNode.Tag = new FolderItem(curPath);
-                    
+
                     parent = folderNode.Nodes;
                 }
                 else
@@ -410,7 +418,7 @@ namespace MonoGame.Tools.Pipeline
                 }
 
                 parent = parentParent;
-            }            
+            }
         }
 
         public void SelectTreeItem(IProjectItem item)
@@ -428,18 +436,18 @@ namespace MonoGame.Tools.Pipeline
 
             var node = _treeView.AllNodes().Find(e => e.Tag == item);
             if (node != null)
-			{
-				// Do something useful, eg...
-				/* 
-				if (!node.IsValid)
-				{
-	                node.ForeColor = Color.Red;
-				}
-				else
-				{
-					node.ForeColor = Color.Black;
-				}*/
-			}
+            {
+                // Do something useful, eg...
+                /* 
+                if (!node.IsValid)
+                {
+                    node.ForeColor = Color.Red;
+                }
+                else
+                {
+                    node.ForeColor = Color.Black;
+                }*/
+            }
         }
 
         public void EndTreeUpdate()
@@ -503,7 +511,7 @@ namespace MonoGame.Tools.Pipeline
                 Filter = "All Files (*.*)|*.*",
                 InitialDirectory = initialDirectory,
                 Multiselect = true,
-                
+
             };
 
             var result = dlg.ShowDialog(this);
@@ -537,18 +545,18 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private void MainView_Load(object sender, EventArgs e)
-        {            
+        {
             // We only load the History.StartupProject if there was not
             // already a project specified via command line.
             if (string.IsNullOrEmpty(OpenProjectPath))
             {
                 var startupProject = History.Default.StartupProject;
-                if (!string.IsNullOrEmpty(startupProject) && File.Exists(startupProject))                
-                    OpenProjectPath = startupProject;                
+                if (!string.IsNullOrEmpty(startupProject) && File.Exists(startupProject))
+                    OpenProjectPath = startupProject;
             }
 
             History.Default.StartupProject = null;
-            
+
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {
                 _controller.OpenProject(OpenProjectPath);
@@ -563,7 +571,7 @@ namespace MonoGame.Tools.Pipeline
                 if (!_controller.Exit())
                     e.Cancel = true;
             }
-        }        
+        }
 
         private void OnNewProjectClick(object sender, EventArgs e)
         {
@@ -596,7 +604,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private void TreeViewAfterSelect(object sender, TreeViewEventArgs e)
-        {            
+        {
             _controller.Selection.Clear(this);
             _propertyGrid.SelectedObject = null;
 
@@ -620,7 +628,7 @@ namespace MonoGame.Tools.Pipeline
 
             // Get the node that the user has clicked.
             var node = _treeView.GetNodeAt(p);
-            if (node == null) 
+            if (node == null)
                 return;
 
             // Select the node the user has clicked.
@@ -631,14 +639,16 @@ namespace MonoGame.Tools.Pipeline
 
         private void BuildMenuItemClick(object sender, EventArgs e)
         {
+            var targetPlatforms = _projectTargetPlatforms.CheckedItems.Cast<TargetPlatformItem>().Select(a1 => a1.TargetPlatform).ToList();
             _controller.LaunchDebugger = _debuggerMenuItem.Checked;
-            _controller.Build(false);
+            _controller.Build(false, targetPlatforms);
         }
 
         private void RebuildMenuItemClick(object sender, EventArgs e)
         {
+            var targetPlatforms = _projectTargetPlatforms.CheckedItems.Cast<TargetPlatformItem>().Select(a1 => a1.TargetPlatform).ToList();
             _controller.LaunchDebugger = _debuggerMenuItem.Checked;
-            _controller.Build(true);
+            _controller.Build(true, targetPlatforms);
         }
 
         private void RebuildItemsMenuItemClick(object sender, EventArgs e)
@@ -656,7 +666,7 @@ namespace MonoGame.Tools.Pipeline
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
         {
             _controller.CancelBuild();
-        }        
+        }
 
         private void TreeViewOnBeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
@@ -712,11 +722,11 @@ namespace MonoGame.Tools.Pipeline
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;
             _cancelBuildMenuItem.Visible = !notBuilding;
-      
+
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
             UpdateRecentProjectList();
         }
-        
+
         private void UpdateUndoRedo(bool canUndo, bool canRedo)
         {
             _undoMenuItem.Enabled = canUndo;
@@ -732,10 +742,10 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = node.Tag as ContentItem;
                 if (item != null && !items.Contains(item))
-                    items.Add(item);                    
+                    items.Add(item);
             }
 
-            _controller.Exclude(items);      
+            _controller.Exclude(items);
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -803,7 +813,7 @@ namespace MonoGame.Tools.Pipeline
 
         // http://stackoverflow.com/a/3955553/168235
         #region Custom Word-Wrapping (Output Window)
-        
+
         const uint EM_SETWORDBREAKPROC = 0x00D0;
 
         [DllImport("user32.dll")]
@@ -812,7 +822,7 @@ namespace MonoGame.Tools.Pipeline
         delegate int EditWordBreakProc(IntPtr text, int pos_in_text, int bCharSet, int action);
 
         event EditWordBreakProc WordWrapCallbackEvent;
-        
+
         private int WordWrapCallback(IntPtr text, int pos_in_text, int bCharSet, int action)
         {
             return 0;

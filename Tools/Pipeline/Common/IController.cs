@@ -87,8 +87,8 @@ namespace MonoGame.Tools.Pipeline
         void CloseProject();
 
         bool SaveProject(bool saveAs);
-        
-        void Build(bool rebuild);
+
+        void Build(bool rebuild, List<Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform> targetPlatforms);
 
         void RebuildItems(IEnumerable<IProjectItem> items);
 
@@ -102,7 +102,7 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(IEnumerable<ContentItem> items);        
+        void Exclude(IEnumerable<ContentItem> items);
 
         void NewItem(string name, string location, ContentItemTemplate template);
 
@@ -124,7 +124,7 @@ namespace MonoGame.Tools.Pipeline
 
         void Redo();
 
-        #endregion        
+        #endregion
 
         string GetFullPath(string filePath);
     }

@@ -23,7 +23,7 @@ namespace MonoGame.Tools.Pipeline
 
         private readonly List<ContentItemTemplate> _templateItems;
 
-        private static readonly string [] _mgcbSearchPaths = new []       
+        private static readonly string[] _mgcbSearchPaths = new[]       
         {
             "",
 #if DEBUG
@@ -48,7 +48,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool ProjectDirty { get; set; }
 
-        public bool ProjectBuilding 
+        public bool ProjectBuilding
         {
             get
             {
@@ -78,10 +78,15 @@ namespace MonoGame.Tools.Pipeline
 
             _templateItems = new List<ContentItemTemplate>();
             LoadTemplates(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
+
+            OnBuildFinished += () =>
+                {
+                    _Build_IsFinished = true;
+                };
         }
 
         public void OnProjectModified()
-        {            
+        {
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
             ProjectDirty = true;
         }
@@ -125,7 +130,7 @@ namespace MonoGame.Tools.Pipeline
 
             // Clear existing project data, initialize to a new blank project.
             _actionStack.Clear();
-            _project = new PipelineProject();            
+            _project = new PipelineProject();
             PipelineTypes.Load(_project);
 
             // Save the new project.
@@ -164,10 +169,10 @@ namespace MonoGame.Tools.Pipeline
                 var parser = new PipelineProjectParser(this, _project);
                 parser.ImportProject(projectFilePath);
 
-                ResolveTypes();                
-                
+                ResolveTypes();
+
                 ProjectOpen = true;
-                ProjectDirty = true;                
+                ProjectDirty = true;
             }
 #if SHIPPING
             catch (Exception e)
@@ -193,7 +198,7 @@ namespace MonoGame.Tools.Pipeline
             string projectFilePath;
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
-            
+
             OpenProject(projectFilePath);
         }
 
@@ -210,7 +215,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 _actionStack.Clear();
                 _project = new PipelineProject();
-                
+
                 var parser = new PipelineProjectParser(this, _project);
                 var errorCallback = new MGBuildParser.ErrorCallback((msg, args) => View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)));
                 parser.OpenProject(projectFilePath, errorCallback);
@@ -288,12 +293,38 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
-        public void Build(bool rebuild)
+        bool _Build_IsFinished = false;
+        public void Build(bool rebuild, List<Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform> targetPlatforms)
         {
-            var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
-            if (LaunchDebugger)
-                commands += " /launchdebugger";
-            BuildCommand(commands);
+            string projOut = _project.OutputDir;
+            if (targetPlatforms != null && targetPlatforms.Count > 0)
+            {
+                foreach (var fe1 in targetPlatforms)
+                {
+                    _Build_IsFinished = false;
+
+                    _project.OutputDir = string.Format("{0}\\{1}", projOut, fe1.ToString());
+                    _project.Platform = fe1;
+                    SaveProject(false);
+
+                    var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
+                    if (LaunchDebugger)
+                        commands += " /launchdebugger";
+                    BuildCommand(commands);
+
+                    while (!_Build_IsFinished)
+                        System.Windows.Forms.Application.DoEvents();
+                }
+                _project.OutputDir = projOut;
+                SaveProject(false);
+            }
+            else
+            {
+                var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
+                if (LaunchDebugger)
+                    commands += " /launchdebugger";
+                BuildCommand(commands);
+            }
         }
 
         public void RebuildItems(IEnumerable<IProjectItem> items)
@@ -363,7 +394,7 @@ namespace MonoGame.Tools.Pipeline
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());          
+                _buildTask.ContinueWith((e) => OnBuildFinished());
         }
 
         private string FindMGCB()
@@ -469,7 +500,7 @@ namespace MonoGame.Tools.Pipeline
 
                 foreach (var item in _project.ContentItems)
                     _view.AddTreeItem(item);
-            }            
+            }
 
             _view.EndTreeUpdate();
         }
@@ -489,7 +520,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public void Include(string initialDirectory)
-        {       
+        {
             // Root the path to the project.
             if (!Path.IsPathRooted(initialDirectory))
                 initialDirectory = Path.Combine(_project.Location, initialDirectory);
@@ -500,7 +531,7 @@ namespace MonoGame.Tools.Pipeline
 
             var action = new IncludeAction(this, files);
             action.Do();
-            _actionStack.Add(action);  
+            _actionStack.Add(action);
         }
 
         public void Exclude(IEnumerable<ContentItem> items)
@@ -545,7 +576,7 @@ namespace MonoGame.Tools.Pipeline
         public event CanUndoRedoChanged OnCanUndoRedoChanged
         {
             add { _actionStack.OnCanUndoRedoChanged += value; }
-            remove { _actionStack.OnCanUndoRedoChanged -= value; } 
+            remove { _actionStack.OnCanUndoRedoChanged -= value; }
         }
 
         public bool CanUndo { get { return _actionStack.CanUndo; } }
@@ -597,7 +628,7 @@ namespace MonoGame.Tools.Pipeline
                         ProcessorName = lines[3],
                         TemplateFile = lines[4],
                     };
-                
+
                 if (_templateItems.Any(i => i.Label == item.Label))
                     continue;
 

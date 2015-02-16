@@ -38,14 +38,13 @@ namespace MonoGame.Tools.Pipeline
             System.Windows.Forms.ToolStripSeparator _toolStripSeparator3;
             System.Windows.Forms.ToolStripSeparator _toolStripSeparator1;
             System.Windows.Forms.ToolStripSeparator _toolStripSeparator2;
-            System.Windows.Forms.SplitContainer _splitTreeProps;
             System.Windows.Forms.SplitContainer _splitEditorOutput;
-            this._propertyGrid = new System.Windows.Forms.PropertyGrid();
             this._outputWindow = new System.Windows.Forms.RichTextBox();
             this._mainMenu = new System.Windows.Forms.MenuStrip();
             this._fileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._newProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._openRecentMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._closeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._importProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -80,17 +79,13 @@ namespace MonoGame.Tools.Pipeline
             this._treeOpenFileLocationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this._treeRebuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._propertyGrid = new System.Windows.Forms.PropertyGrid();
             this._treeView = new MonoGame.Tools.Pipeline.MultiSelectTreeview();
-            this._openRecentMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._projectTargetPlatforms = new System.Windows.Forms.CheckedListBox();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            _splitTreeProps = new System.Windows.Forms.SplitContainer();
             _splitEditorOutput = new System.Windows.Forms.SplitContainer();
-            ((System.ComponentModel.ISupportInitialize)(_splitTreeProps)).BeginInit();
-            _splitTreeProps.Panel1.SuspendLayout();
-            _splitTreeProps.Panel2.SuspendLayout();
-            _splitTreeProps.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(_splitEditorOutput)).BeginInit();
             _splitEditorOutput.Panel1.SuspendLayout();
             _splitEditorOutput.Panel2.SuspendLayout();
@@ -114,33 +109,6 @@ namespace MonoGame.Tools.Pipeline
             _toolStripSeparator2.Name = "_toolStripSeparator2";
             _toolStripSeparator2.Size = new System.Drawing.Size(143, 6);
             // 
-            // _splitTreeProps
-            // 
-            _splitTreeProps.Dock = System.Windows.Forms.DockStyle.Fill;
-            _splitTreeProps.Location = new System.Drawing.Point(0, 0);
-            _splitTreeProps.Name = "_splitTreeProps";
-            _splitTreeProps.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // _splitTreeProps.Panel1
-            // 
-            _splitTreeProps.Panel1.Controls.Add(this._treeView);
-            // 
-            // _splitTreeProps.Panel2
-            // 
-            _splitTreeProps.Panel2.Controls.Add(this._propertyGrid);
-            _splitTreeProps.Size = new System.Drawing.Size(249, 537);
-            _splitTreeProps.SplitterDistance = 210;
-            _splitTreeProps.TabIndex = 1;
-            _splitTreeProps.TabStop = false;
-            // 
-            // _propertyGrid
-            // 
-            this._propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._propertyGrid.Location = new System.Drawing.Point(0, 0);
-            this._propertyGrid.Name = "_propertyGrid";
-            this._propertyGrid.Size = new System.Drawing.Size(249, 323);
-            this._propertyGrid.TabIndex = 0;
-            // 
             // _splitEditorOutput
             // 
             _splitEditorOutput.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -150,11 +118,13 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _splitEditorOutput.Panel1
             // 
-            _splitEditorOutput.Panel1.Controls.Add(_splitTreeProps);
+            _splitEditorOutput.Panel1.Controls.Add(this._treeView);
+            _splitEditorOutput.Panel1.Controls.Add(this._projectTargetPlatforms);
             // 
             // _splitEditorOutput.Panel2
             // 
             _splitEditorOutput.Panel2.Controls.Add(this._outputWindow);
+            _splitEditorOutput.Panel2.Controls.Add(this._propertyGrid);
             _splitEditorOutput.Size = new System.Drawing.Size(784, 537);
             _splitEditorOutput.SplitterDistance = 249;
             _splitEditorOutput.TabIndex = 2;
@@ -168,7 +138,7 @@ namespace MonoGame.Tools.Pipeline
             this._outputWindow.Name = "_outputWindow";
             this._outputWindow.ReadOnly = true;
             this._outputWindow.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this._outputWindow.Size = new System.Drawing.Size(531, 537);
+            this._outputWindow.Size = new System.Drawing.Size(282, 537);
             this._outputWindow.TabIndex = 0;
             this._outputWindow.TabStop = false;
             this._outputWindow.Text = "";
@@ -221,6 +191,12 @@ namespace MonoGame.Tools.Pipeline
             this._openProjectMenuItem.Size = new System.Drawing.Size(182, 22);
             this._openProjectMenuItem.Text = "Open...";
             this._openProjectMenuItem.Click += new System.EventHandler(this.OnOpenProjectClick);
+            // 
+            // _openRecentMenuItem
+            // 
+            this._openRecentMenuItem.Name = "_openRecentMenuItem";
+            this._openRecentMenuItem.Size = new System.Drawing.Size(182, 22);
+            this._openRecentMenuItem.Text = "Open Recent";
             // 
             // _closeMenuItem
             // 
@@ -485,21 +461,30 @@ namespace MonoGame.Tools.Pipeline
             this._treeRebuildMenuItem.Text = "Rebuild";
             this._treeRebuildMenuItem.Click += new System.EventHandler(this.RebuildItemsMenuItemClick);
             // 
+            // _propertyGrid
+            // 
+            this._propertyGrid.Dock = System.Windows.Forms.DockStyle.Right;
+            this._propertyGrid.Location = new System.Drawing.Point(282, 0);
+            this._propertyGrid.Name = "_propertyGrid";
+            this._propertyGrid.Size = new System.Drawing.Size(249, 537);
+            this._propertyGrid.TabIndex = 1;
+            // 
             // _treeView
             // 
             this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._treeView.Location = new System.Drawing.Point(0, 0);
             this._treeView.Name = "_treeView";
-            this._treeView.Size = new System.Drawing.Size(249, 210);
-            this._treeView.TabIndex = 0;
-            this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
-            this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
+            this._treeView.Size = new System.Drawing.Size(249, 443);
+            this._treeView.TabIndex = 3;
             // 
-            // _openRecentMenuItem
+            // _projectTargetPlatforms
             // 
-            this._openRecentMenuItem.Name = "_openRecentMenuItem";
-            this._openRecentMenuItem.Size = new System.Drawing.Size(182, 22);
-            this._openRecentMenuItem.Text = "Open Recent";
+            this._projectTargetPlatforms.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this._projectTargetPlatforms.FormattingEnabled = true;
+            this._projectTargetPlatforms.Location = new System.Drawing.Point(0, 443);
+            this._projectTargetPlatforms.Name = "_projectTargetPlatforms";
+            this._projectTargetPlatforms.Size = new System.Drawing.Size(249, 94);
+            this._projectTargetPlatforms.TabIndex = 5;
             // 
             // MainView
             // 
@@ -515,10 +500,6 @@ namespace MonoGame.Tools.Pipeline
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainView_FormClosing);
             this.Load += new System.EventHandler(this.MainView_Load);
             this.Shown += new System.EventHandler(this.MainView_Shown);
-            _splitTreeProps.Panel1.ResumeLayout(false);
-            _splitTreeProps.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(_splitTreeProps)).EndInit();
-            _splitTreeProps.ResumeLayout(false);
             _splitEditorOutput.Panel1.ResumeLayout(false);
             _splitEditorOutput.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(_splitEditorOutput)).EndInit();
@@ -535,8 +516,6 @@ namespace MonoGame.Tools.Pipeline
 
         private System.Windows.Forms.MenuStrip _mainMenu;
         private System.Windows.Forms.ToolStripMenuItem _fileMenu;
-        private MultiSelectTreeview _treeView;
-        private System.Windows.Forms.PropertyGrid _propertyGrid;
         private System.Windows.Forms.ToolStripMenuItem _newProjectMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _openProjectMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _saveMenuItem;
@@ -575,6 +554,9 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripMenuItem _treeOpenFileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _treeOpenFileLocationMenuItem;
         private ToolStripMenuItem _openRecentMenuItem;
+        private MultiSelectTreeview _treeView;
+        private CheckedListBox _projectTargetPlatforms;
+        private PropertyGrid _propertyGrid;
     }
 }
 
