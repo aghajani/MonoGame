@@ -397,7 +397,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var data = new byte[width * height * 4];
 
             var colorSpace = CGColorSpace.CreateDeviceRGB();
-            var bitmapContext = new CGBitmapContext(data, width, height, 8, width * 4, colorSpace, CGBitmapFlags.PremultipliedLast);
+            var bitmapContext = new CGBitmapContext(data, (int)width, (int)height, 8, (int)width * 4, colorSpace, CGImageAlphaInfo.PremultipliedLast);
             bitmapContext.DrawImage(new RectangleF(0, 0, width, height), cgImage);
             bitmapContext.Dispose();
             colorSpace.Dispose();
